@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      // program to shuffle the deck of cards
+
+      // declare card elements
+      const suits = ["spades", "diamonds", "clubs", "hearts"];
+      const values = ["ace","2",        "3",        "4",        "5",        "6","7","8","9","10","jack","queen","king",];
+
+      // empty array to contain cards
+      let deck;
+
+      function drawDeck() {
+        div = document.getElementById("display");
+        div.innerHTML = "";
+        for (card of deck) {
+          var img = document.createElement('img');
+          img.src = `cards/${card.Value}_of_${card.Suit}.png`;
+          img.className = "card";
+          div.appendChild(img);
+        }
+      }
+
+      function reset() {
+        deck = [];
+        // create a deck of cards
+        for (let i = 0; i < suits.length; i++) {
+          for (let x = 0; x < values.length; x++) {
+            let card = { Value: values[x], Suit: suits[i] };
+            deck.push(card);
+          }
+        }
+        drawDeck();
+      }
+      function shuffle() {
+        // shuffle the cards
+        for (let i = deck.length - 1; i > 0; i--) {
+          let j = Math.floor(Math.random() * i);
+          let temp = deck[i];
+          deck[i] = deck[j];
+          deck[j] = temp;
+        }
+        drawDeck();
+      }
+    </script>
+    <style>
+      .card {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="display">
+    </div>
+    <button onclick="reset()">Reset</button>
+    <button onclick="shuffle()">Shuffle</button>
+  </body>
+</html>

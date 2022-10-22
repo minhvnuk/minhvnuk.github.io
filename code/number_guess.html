@@ -1,0 +1,46 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <script type="text/javascript">
+      var generated;
+      var times;
+      function generateRandomNumber() {
+        const lower = parseInt(document.getElementById("txtLower").value);
+        const upper = parseInt(document.getElementById("txtUpper").value);
+        generated = Math.floor(Math.random() * (upper-lower+1) + lower);
+        times = Math.ceil(Math.log2(upper-lower+1));
+        document.getElementById('generateStatus').innerHTML = `Number generated. You have ${times} times to guess`;
+        document.getElementById("left").innerHTML = `You have ${times} remaining to guess`;
+      }
+      function checkNumber() {
+        const guess = parseInt(document.getElementById("guessNumber").value);
+        const result = document.getElementById("guessResult");
+        if (guess < generated) {
+          result.innerHTML = "Your number is smaller than the generated number";
+          times--;
+        }
+        else if (guess > generated) {
+          result.innerHTML = "Your number is greater than the generated number";
+          times--;
+        }
+        else { 
+          result.innerHTML = "correct";
+        }
+        if (times == 0) {
+          result.innerHTML += "You lose";
+        } 
+        document.getElementById("left").innerHTML = `You have ${times} remaining to guess`;
+      }
+    </script>
+  </head>
+  <body>
+    Lower bound:<input type="text" value="" id="txtLower"> 
+    Upper bound:<input type="text" value="" id="txtUpper"> 
+    <button onclick="generateRandomNumber()">Generate</button> <br>
+    <p id="generateStatus" class="" style="">kjhhlh</p>
+    Enter number: <input type="text" id="guessNumber">
+    <button onclick="checkNumber()">guess</button>
+    <p id="guessResult">jkhkhlh</p>
+    <p id="left">kjkljl</p>
+  </body>
+</html>

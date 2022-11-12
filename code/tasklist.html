@@ -1,0 +1,145 @@
+<html>
+  <head>
+    <script>
+      let baseUrl = 'https://tasklist-minh.herokuapp.com';
+      let token = null;
+      function setStatus(text) {
+        document.getElementById('status').innerText = text;
+      }
+      async function register() {
+        let email = document.getElementById('txtSignupEmail').value;
+        let password = document.getElementById('txtSignupPassword').value;
+        let user = {email, password};
+        let options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        }
+        let response = await fetch(`${baseUrl}/auth`, options);
+        if (response.ok) {
+          setStatus('Registered');
+        } else {
+          alert('Register failed');
+        }
+      }
+      async function login() {
+        let email = document.getElementById('txtLoginEmail').value;
+        let password = document.getElementById('txtLoginPassword').value;
+        let user = {email, password};
+        let options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(user)
+        }
+        let response = await fetch(`${baseUrl}/auth/sign_in`, options);
+        if (response.ok) {
+          setStatus('Login successfully');
+          token = {
+            'access-token': response.headers.get('access-token'),
+            client: response.headers.get('client'),
+            uid: response.headers.get('uid'),
+          };
+        } else {
+          alert('Login failed');
+        }
+      }
+      async function fetchTaskLists() {
+        if (token == null)
+          return alert('You need to login first');
+        let options = {
+          headers: token
+        };
+        let response = await fetch(`${baseUrl}/task_lists`, options);
+        if (response.ok) {
+          setStatus('task list fetched');
+          return await response.json();
+        } else {
+          alert('fetch task list failed');
+        }
+      }
+      async function refreshTaskList() {
+        document.getElementById("tasklistTable").innerHTML = '';
+        let tasklists = await fetchTaskLists();
+        for (tasklist of tasklists) {
+          var x = document.createElement("TR");
+          x.setAttribute("id", `tasklist${tasklist.id}`);
+          document.getElementById("tasklistTable").appendChild(x);
+          var y = document.createElement("TD");
+          var t = document.createTextNode(tasklist.id);
+          y.appendChild(t);
+          x.appendChild(y);
+          
+          y = document.createElement("TD");
+          t = document.createTextNode(tasklist.name);
+          y.appendChild(t);
+          x.appendChild(y);
+
+          y = document.createElement("TD");
+          t = document.createTextNode(tasklist.description);
+          y.appendChild(t);
+          x.appendChild(y);
+        }
+        
+      }
+      async function createTaskList() {
+        let name = document.getElementById('txtTasklistName').value;
+        let description = document.getElementById('txtTasklistDescription').value;
+        let tasklist = {name, description};
+        let options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+            ...token
+          },
+          body: JSON.stringify(tasklist)
+        }
+        let response = await fetch(`${baseUrl}/task_lists`, options);
+        if (response.ok) {
+          setStatus('Task list created successfully');
+          refreshTaskList();
+        } else {
+          alert('Create task list failed');
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <p id="status"></p>
+    <div>
+      <h3>Register:</h3>
+      <div>Email: <input type="text" id="txtSignupEmail" /></div>
+      <div>Password: <input type="text" id="txtSignupPassword" /><div>
+      <button onclick="register()">Register</button>
+    </div>
+    <div>
+      <h3>Login:</h3>
+      <div>Email: <input type="text" id="txtLoginEmail" /></div>
+      <div>Password: <input type="text" id="txtLoginPassword" /><div>
+      <button onclick="login()">Login</button>
+    </div>
+    <div>
+      <h3>Task List:</h3>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+        <tbody id="tasklistTable">
+
+        </tbody>
+      </table>
+      <button onclick="fetchTaskLists()">Fetch TaskLists</button>
+    </div>
+    <div>
+      <h3>Create Task List:</h3>
+      <div>Name: <input type="text" id="txtTasklistName" /></div>
+      <div>Description: <input type="text" id="txtTasklistDescription" /><div>
+      <button onclick="createTaskList()">Create TaskList</button>
+    </div>
+  </body>
+</html>

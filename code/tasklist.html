@@ -3,6 +3,7 @@
     <script>
       let baseUrl = 'https://tasklist-minh.herokuapp.com';
       let token = null;
+      let user = null;
       function setStatus(text) {
         document.getElementById('status').innerText = text;
       }
@@ -43,6 +44,7 @@
             client: response.headers.get('client'),
             uid: response.headers.get('uid'),
           };
+          sessionStorage.setItem('token',JSON.stringify(token));
         } else {
           alert('Login failed');
         }
@@ -105,10 +107,49 @@
           alert('Create task list failed');
         }
       }
+
+      function readSavedToken() {
+        const tokenJson = sessionStorage.getItem('token');
+        if (tokenJson) {
+          try {
+            return JSON.parse(tokenJson);
+          } catch {
+            return null;
+          }
+        }
+      }
+
+      async function validateToken() {
+        let options = {
+          headers: token
+        };
+        let response = await fetch(`${baseUrl}/auth/validate_token`, options);
+
+        if (response.ok) { // if HTTP-status is 200-299
+          let json = await response.json();
+          return json.data;
+          console.log(user);
+        } else {
+          return null;  
+        }        
+      }
+
+      function setUser(text) {
+        document.getElementById('user').innerHTML = `Logged in as ${text}`;
+      }
+
+      window.onload = async function() {
+        token = readSavedToken();
+        user = await validateToken();
+        if (user) {
+          setUser(user.email);
+        }
+      }
     </script>
   </head>
   <body>
     <p id="status"></p>
+    <p id="user">Not login</p>
     <div>
       <h3>Register:</h3>
       <div>Email: <input type="text" id="txtSignupEmail" /></div>
